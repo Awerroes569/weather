@@ -8,8 +8,8 @@ const PickCity = ({ searching }) => {
 
   const searchingCity = (e) => {
     e.preventDefault();
-    console.log('city', city);
     searching(city);
+    setCity('');
   };
 
   return (
