@@ -10,9 +10,11 @@ const WeatherBox = props => {
   const [currentCity, setCurrentCity] = useState('');
   const [currentTemperature, setCurrentTemperature] = useState('');
   const [currentWeatherIcon, setCurrentWeatherIcon] = useState('');
+  const [showWeather, setShowWeather] = useState(false);
 
   const handleCityChange = useCallback(
     (city) => {
+      setShowWeather(false);
       console.log('city', city);
       fetch(`http://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`)
         .then(res => res.json())
@@ -24,6 +26,7 @@ const WeatherBox = props => {
       setCurrentCity(data.name);
       setCurrentTemperature(data.main.temp);
       setCurrentWeatherIcon(data.weather[0].icon);
+      setShowWeather(true);
    });
     },
     []
@@ -32,11 +35,13 @@ const WeatherBox = props => {
   return (
     <section>
       <PickCity searching={handleCityChange} />
-      <WeatherSummary
-        city={currentCity}
-        temp={currentTemperature}
-        icon={currentWeatherIcon}
-      />
+      { showWeather && currentCity &&
+        <WeatherSummary
+          city={currentCity}
+          temp={currentTemperature}
+          icon={currentWeatherIcon}
+        />
+      }
       <Loader />
     </section>
   )
