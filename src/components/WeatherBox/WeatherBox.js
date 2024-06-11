@@ -2,6 +2,7 @@ import PickCity from '../PickCity/PickCity';
 import WeatherSummary from '../WeatherSummary/WeatherSummary';
 import Loader from '../Loader/Loader';
 import { useCallback, useState } from 'react';
+import ErrorBox from '../ErrorBox/ErrorBox';
 
 const WeatherBox = props => {
 
@@ -11,25 +12,37 @@ const WeatherBox = props => {
   const [currentTemperature, setCurrentTemperature] = useState('');
   const [currentWeatherIcon, setCurrentWeatherIcon] = useState('');
   const [showWeather, setShowWeather] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleCityChange = useCallback(
     (city) => {
+      setError('');
       setShowWeather(false);
+      setLoading(true);
       console.log('city', city);
       fetch(`http://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`)
-        .then(res => res.json())
-        .then(data => {
-      console.log(data);
-      console.log('city',data.name);
-      console.log('temp',data.main.temp);
-      console.log('icon',data.weather[0].icon);
-      setCurrentCity(data.name);
-      setCurrentTemperature(data.main.temp);
-      setCurrentWeatherIcon(data.weather[0].icon);
-      setShowWeather(true);
-   });
-    },
-    []
+        
+      .then ( res => {
+          if (res.status === 404) {
+            setError('city not found');
+            setLoading(false);
+            return;
+          } else {
+            return res.json()
+            .then(data => {
+              console.log(data);
+              console.log('city',data.name);
+              console.log('temp',data.main.temp);
+              console.log('icon',data.weather[0].icon);
+              setCurrentCity(data.name);
+              setCurrentTemperature(data.main.temp);
+              setCurrentWeatherIcon(data.weather[0].icon);
+              setShowWeather(true);
+              setLoading(false);
+            });}})}
+
+    ,[]
   );
 
   return (
@@ -42,7 +55,14 @@ const WeatherBox = props => {
           icon={currentWeatherIcon}
         />
       }
-      <Loader />
+      {
+        loading &&
+        <Loader />
+      }
+      {
+        error &&
+        <ErrorBox>{error}</ErrorBox>
+      }
     </section>
   )
 };
