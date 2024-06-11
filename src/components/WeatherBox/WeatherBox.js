@@ -20,7 +20,6 @@ const WeatherBox = props => {
       setError('');
       setShowWeather(false);
       setLoading(true);
-      console.log('city', city);
       fetch(`http://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`)
         
       .then ( res => {
@@ -31,16 +30,15 @@ const WeatherBox = props => {
           } else {
             return res.json()
             .then(data => {
-              console.log(data);
-              console.log('city',data.name);
-              console.log('temp',data.main.temp);
-              console.log('icon',data.weather[0].icon);
               setCurrentCity(data.name);
               setCurrentTemperature(data.main.temp);
               setCurrentWeatherIcon(data.weather[0].icon);
               setShowWeather(true);
               setLoading(false);
-            });}})}
+            });
+          }
+      })
+    }
 
     ,[]
   );
